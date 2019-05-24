@@ -15,7 +15,7 @@ export default {
   render(h) {
     const { panes, currentName, onTabClick } = this
     return (
-      <div class="tabs-navs flex">
+      <div class="tabs-navs">
         { panes &&
           panes.map(item => {
             return (
@@ -34,6 +34,7 @@ export default {
 .tabs-navs {
   margin-bottom: 15px;
   border-bottom: 1px solid #ddd;
+  display: flex;
 }
 .nav-item {
   margin: 0 20px;
