@@ -6,20 +6,18 @@
 
 <script>
 export default {
+  name: "TabPane",
+  componentName: "TabPane",
   props: {
     label: String,
-    name: String,
+    name: String
   },
   computed: {
     active() {
-      return this.$parent.currentName === this.name
-    },
-  },
-}
+      return this.$parent.currentName === this.name;
+    }
+  }
+};
 </script>
 
-<style lang="scss" scoped>
-
-</style>
-
-
+<style lang="scss" scoped></style>

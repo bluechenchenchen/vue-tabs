@@ -2,63 +2,71 @@
 
 </docs>
 <script>
-import TabNav from './tab-nav';
-  export default {
-    components: {
-      TabNav
+import TabNav from "./tab-nav";
+export default {
+  components: { TabNav },
+  props: { activeName: String },
+  data() {
+    return { currentName: this.activeName, panes: [] };
+  },
+  methods: {
+    handleTabClick(ev, tabName) {
+      this.currentName = tabName;
+      this.$emit("tab-click", tabName, ev);
     },
-    props: {
-      activeName: String
-    },
-    data() {
-      return {
-        currentName: this.activeName,
-      }
-    },
-    methods: {
-      handleTabClick(ev, tabName) {
-        this.currentName = tabName
-        this.$emit('tab-click', tabName, ev)
-      },
-      calcPaneInstances() {
-        console.log(this.$slots.default)
-        if (this.$slots.default) {
-          const panes = this.$slots.default.map(item => {
-            return {
-              label: item.data.attrs.label || item.componentOptions.propsData.label,
-              name: item.data.attrs.name || item.componentOptions.propsData.name,
-            }
-          })
-          this.panes = panes
+    calcPaneInstances() {
+      if (this.$slots.default) {
+        const paneSlots = this.$slots.default.filter(
+          vnode =>
+            vnode.tag &&
+            vnode.componentOptions &&
+            vnode.componentOptions.Ctor.options.name === "TabPane"
+        );
+        const panes = paneSlots.map(
+          ({ componentInstance }) => componentInstance
+        );
+        const panesChanged = !(
+          panes.length === this.panes.length &&
+          panes.every((pane, index) => pane === this.panes[index])
+        );
+        if (panesChanged) {
+          this.panes = panes;
         }
-      },
-    },
-    render(h) {
-      let { panes, currentName, handleTabClick } = this
-      const navData = {
-        props: {
-          panes,
-          currentName,
-          onTabClick: handleTabClick,
-        }
+        // this.panes = panes;
+      } else if (this.panes.length !== 0) {
+        this.panes = [];
       }
-      return (
-        <div class="tabs-container tabs">
-          <tab-nav { ...navData }></tab-nav>
-          <div class="tabs-panels">
-            {this.$slots.default}
-          </div>
-        </div>
-      )
-    },
-    created () {
-      this.calcPaneInstances()
-    },
-}
+    }
+  },
+  render() {
+    let { panes, currentName, handleTabClick } = this;
+    const navData = {
+      props: {
+        panes,
+        currentName,
+        onTabClick: handleTabClick
+      }
+    };
+    return (
+      <div class="tabs-container tabs">
+        <tab-nav {...navData} />
+        <div class="tabs-panels">{this.$slots.default}</div>
+      </div>
+    );
+  },
+  created() {
+    // this.$on("tab-nav-update", this.calcPaneInstances.bind(null, true));
+  },
+  mounted() {
+    this.calcPaneInstances();
+  },
+
+  updated() {
+    this.calcPaneInstances();
+    // eslint-disable-next-line no-console
+    // console.log("updated")
+  }
+};
 </script>
 
-<style lang="scss" scoped>
-
-</style>
-
-
+<style lang="scss" scoped></style>
